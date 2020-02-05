@@ -1,0 +1,44 @@
+syntax = "proto3";
+package mtpPlatino;
+
+/* Phase 1: handshaking: the dron and the end-devices interchange their IDs.
+ In a first step, the drone send its ID and in a second step (after validation)
+ the end-device sends its ID to the drone
+ if ok(dron receives all IDs) --> go to phase 2, or
+ if   (dron does not receive any ID) --> it is still ok, take a note and go to phase 2
+ if ko(none ID is received by drone) --> abort */
+
+message MSG_PHASE1_DRONE_ID {
+	int32 id = 1;
+}
+
+message MSG_PHASE1_ENDDEVICE_ID {
+	int32 id = 1;
+	int32 numPackets = 2;
+}
+
+
+/* Phase 2: data transmission: the end-device sends the data collected to the drone,
+   the dron only sends NACK when it detects a missing packet
+   In order to reduce the downlink  messages (drone-->end-device) the drone will not ack
+   the messages of the end-device. Only in case drone lose some packet in the sequence it will
+   send a Non ACK to the intended device. The last packet in the sequence is assumed also
+   to be the last message in the communication */
+
+message MSG_PHASE2_ENDDEVICE_DATA {
+  	int32 idDev = 1;
+  	int32 idPacket = 2;
+	float nodeLoad = 3;
+	float batteryLoad = 4;
+	float panelLoad = 5;
+	float windSpeed = 6;
+	float temperature = 7;
+	float humidity = 8;
+	float batteryVolt = 9;
+	int32 samplingTime = 10;
+}
+
+message MSG_PHASE2_DRONE_NACK {
+	int32 id = 1;
+  	int32 idPacket = 2;
+}
