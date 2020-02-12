@@ -1,0 +1,12 @@
+Drone/.pio
+PlatinoNode/.pio
+Drone/.vscode/.browse.c_cpp.db*
+Drone/.vscode/c_cpp_properties.json
+Drone/.vscode/launch.json
+Drone/.vscode/ipch
+Drone/.vscode/extensions.json
+PlatinoNode/.vscode/.browse.c_cpp.db*
+PlatinoNode/.vscode/c_cpp_properties.json
+PlatinoNode/.vscode/launch.json
+PlatinoNode/.vscode/ipch
+PlatinoNode/.vscode/extensions.json
