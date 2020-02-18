@@ -61,68 +61,68 @@ void loop() {
 
 /* TODO: This function should read from the store of the device the data previously collected */
 void fillDataMessage(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA* msg3, uint8_t cont){
-    msg3->idDev = IDDev;
-    msg3->idPacket = cont;
-    msg3->nodeLoad = 1.2;
-    msg3->batteryLoad = 2.1;
-    msg3->panelLoad = 0.2;
-    msg3->windSpeed = 3.5;
-    msg3->temperature = 30;
-    msg3->humidity = 80;
-    msg3->batteryVolt = 0.2;
-    msg3->samplingTime = t;
+   msg3->idDev = IDDev;
+   msg3->idPacket = cont;
+   msg3->nodeLoad = 1.2;
+   msg3->batteryLoad = 2.1;
+   msg3->panelLoad = 0.2;
+   msg3->windSpeed = 3.5;
+   msg3->temperature = 30;
+   msg3->humidity = 80;
+   msg3->batteryVolt = 0.2;
+   msg3->samplingTime = t;
 }
 
 int receiveSYNC(){
-     platform.receiveLoRa(buffer,&len);
-     istream = pb_istream_from_buffer(buffer, len);
-     pb_decode(&istream, mtpPlatino_MSG_PHASE1_DRONE_ID_fields, &msg1);
- 
-     Serial.print("Node ");
-     Serial.print(IDDev);
-     Serial.print(":");
-     Serial.print(msg1.id);
-    
-     if (msg1.id!=IDDrone){
-        Serial.println(" DRONE not recognized");
-     }else{
-        Serial.println(" DRONE  recognized");
-     }
-     return 0;
+   platform.receiveLoRa(buffer,&len);
+   istream = pb_istream_from_buffer(buffer, len);
+   pb_decode(&istream, mtpPlatino_MSG_PHASE1_DRONE_ID_fields, &msg1);
+
+   Serial.print("Node ");
+   Serial.print(IDDev);
+   Serial.print(":");
+   Serial.print(msg1.id);
+   
+   if (msg1.id!=IDDrone){
+      Serial.println(" DRONE not recognized");
+   }else{
+      Serial.println(" DRONE  recognized");
+   }
+   return 0;
 }
         
 int sendMyIDToDrone(){
-      msg2.id = IDDev;
-      msg2.numPackets = N;
-      ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-      pb_encode(&ostream, mtpPlatino_MSG_PHASE1_ENDDEVICE_ID_fields, &msg2);
-      len = ostream.bytes_written;
-      platform.sendLoRaPB(buffer,len);
-      return 0;
+   msg2.id = IDDev;
+   msg2.numPackets = N;
+   ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+   pb_encode(&ostream, mtpPlatino_MSG_PHASE1_ENDDEVICE_ID_fields, &msg2);
+   len = ostream.bytes_written;
+   platform.sendLoRaPB(buffer,len);
+   return 0;
 }
 
 
 int sendDataToDrone(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA* msg3){
-      bool retransmission = 0;
-      while (!retransmission){
-          ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-          pb_encode(&ostream, mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA_fields, &msg3);
-          len = ostream.bytes_written;
-          platform.sendLoRaPB(buffer,len);
+   bool retransmission = 0;
+   while (!retransmission){
+      ostream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+      pb_encode(&ostream, mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA_fields, &msg3);
+      len = ostream.bytes_written;
+      platform.sendLoRaPB(buffer,len);
 
-          /* And wait for a while to see if you receive a NACK from the drone */
-          platform.receiveLoRa(buffer,&len);
-          if (len == 0) { return 0; }
-          
-          istream = pb_istream_from_buffer(buffer, len);
-          pb_decode(&istream, mtpPlatino_MSG_PHASE2_DRONE_NACK_fields, &msg4);
+      /* And wait for a while to see if you receive a NACK from the drone */
+      platform.receiveLoRa(buffer,&len);
+      if (len == 0) { return 0; }
+      
+      istream = pb_istream_from_buffer(buffer, len);
+      pb_decode(&istream, mtpPlatino_MSG_PHASE2_DRONE_NACK_fields, &msg4);
 
-          // We need to check that msg4.idPacket == msg3.idPacket
-          if (msg4.idPacket == msg3->idPacket){
-                retransmission = 1;
-          }else{
-            retransmission = 0;
-          }
-        }
-        return 0;
+      // We need to check that msg4.idPacket == msg3.idPacket
+      if (msg4.idPacket == msg3->idPacket){
+         retransmission = 1;
+      }else{
+         retransmission = 0;
+      }
+   }
+   return 0;
 }
