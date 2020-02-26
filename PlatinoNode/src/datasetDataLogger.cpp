@@ -1,9 +1,8 @@
 #include <Arduino.h>
-//#include "mtpPlatino.pb.h"
+
+#include "mtpPlatino.pb.h"
 
 #include <platform.h>
-
-
 #include <platino.pb.h>
 
 #include <pb_common.h>
@@ -36,12 +35,10 @@ void fillDataMessage(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA* msg3, uint8_t cont);
 int receiveSYNC();
 int sendMyIDToDrone();
 int sendDataToDrone(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA* msg3);
-void sendLora();
+void sendToDrone();
 float readINA0();
 float readINA1();
 float readINA2();
-
-
 
 int contLoop=0;
 float value;
@@ -51,7 +48,7 @@ int SEC = 5;
 String filename="test.txt";
 String line = "";
 uint8_t mode = 0;
-//pb_PlatinoEvent platino  = pb_PlatinoEvent_init_zero;
+//pb_PlatinoEvent platino = pb_PlatinoEvent_init_zero;
 
 void setup() {
   // put your setup code here, to run once:
@@ -90,11 +87,12 @@ void loop() {
 
   line = line + contLoop + ":";
   contLoop++;
-   
+  
+  msg3.idDev = IDDev;
+
   /* Sensor 1: ina1 associated to the load current */
   t1 = millis();
   value = readINA1();
-  //platino.nodeLoad = value;
   msg3.nodeLoad = value;
   Serial.print(value);
   Serial.print(",");
@@ -103,8 +101,7 @@ void loop() {
 
   /* Sensor 2: ina2 associated to the battery current */
   t1 = millis();
-  value=readINA2();
-  // platino.batteryLoad = value;
+  value = readINA2();
   msg3.batteryLoad = value;
   Serial.print(value,4);
   Serial.print(",");
@@ -116,7 +113,6 @@ void loop() {
   /* Sensor 3: ina0 associated to the current of the panel */
   t1 = millis();  
   value = readINA0();
-  // platino.panelLoad = value;
   msg3.panelLoad = value;
   Serial.print(value,4);
   Serial.print(",");
@@ -128,7 +124,6 @@ void loop() {
   /* Sensor 4: get the speed of wind by reading the anenometer */
   t1 = millis();  
   value = platform.getSpeedOfWind();
-  // platino.windSpeed = value;
   msg3.windSpeed = value;
   Serial.print(value,4);
   Serial.print(",");
@@ -140,7 +135,6 @@ void loop() {
   /* Sensor 5: read temperature */
   t1 = millis(); 
   value = platform.getTemperature();
-  // platino.temperature = value;
   msg3.temperature = value;
   Serial.print(value,4);
   Serial.print(",");
@@ -152,7 +146,6 @@ void loop() {
   /* Sensor 6: read humidity   */
   t1 = millis(); 
   value = platform.getHumidity();
-  //platino.humidity = value;
   msg3.humidity = value;
   Serial.print(value,4);
   Serial.print(",");
@@ -164,14 +157,12 @@ void loop() {
   /* Sensor 7: read voltage*/
   t1 = millis(); 
   value = platform.getBatteryVoltage();
-  //platino.batteryVolt = value;
   msg3.batteryVolt = value;
   Serial.print(value,4);
   Serial.print(",");
   t2 = millis();
   diff = t2 - t1;
   t_ciclo = t_ciclo + (diff);
-  //platino.samplingTime = t_ciclo;
   msg3.samplingTime = t_ciclo;
   
   line = line + value + ":";
@@ -180,14 +171,13 @@ void loop() {
   
 
   /* Writing SD */
-  platform.open(filename,mode);
+  platform.open(filename, mode);
   platform.writeline(line);
   platform.close();
-  platform.displayLCD("",line);
+  platform.displayLCD("", line);
 
   /* Send a PB with LoRa*/
-  // platform.sendLoRaPB(platino);
-  sendLora();
+  sendToDrone();
   
   t_ciclo = 0;
   line = "";
@@ -214,7 +204,7 @@ float readINA2(){
   return value;
 }
 
-void sendLora() {
+void sendToDrone() {
   //Phase 1: the end-device receives a message from the drone
   ret = receiveSYNC();
 
@@ -224,8 +214,8 @@ void sendLora() {
   //Phase 2: data transmission
   cont = 0;
   while(cont < N) {
-    //Fill the message
-    fillDataMessage(&msg3, cont);
+    //Send the data to the drone
+    msg3.idPacket = cont;
     ret = sendDataToDrone(&msg3);
     cont = cont + 1;
     if (cont == N) continue;
@@ -233,21 +223,8 @@ void sendLora() {
   delay(t);
 }
 
-void fillDataMessage(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA* msg3, uint8_t cont){
-  msg3->idDev = IDDev;
-  msg3->idPacket = cont;
-  msg3->nodeLoad = 1.2;
-  msg3->batteryLoad = 2.1;
-  msg3->panelLoad = 0.2;
-  msg3->windSpeed = 3.5;
-  msg3->temperature = 30;
-  msg3->humidity = 80;
-  msg3->batteryVolt = 0.2;
-  msg3->samplingTime = t;
-}
-
 int receiveSYNC(){
-  platform.receiveLoRa(buffer,&len);
+  platform.receiveLoRa(buffer, &len);
   istream = pb_istream_from_buffer(buffer, len);
   pb_decode(&istream, mtpPlatino_MSG_PHASE1_DRONE_ID_fields, &msg1);
 
@@ -256,7 +233,7 @@ int receiveSYNC(){
   Serial.print(":");
   Serial.print(msg1.id);
   
-  if (msg1.id!=IDDrone){
+  if (msg1.id != IDDrone){
     Serial.println(" DRONE not recognized");
   }else{
     Serial.println(" DRONE  recognized");
