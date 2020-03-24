@@ -105,7 +105,7 @@ void loop()
     aux_assignment = assignment.assign_plan(time);
     assigned = true;
   }
-  else if (hour = 0)
+  else if (hour == 0)
     plan_assignment = aux_assignment;
 
   // put your main code here, to run repeatedly:
