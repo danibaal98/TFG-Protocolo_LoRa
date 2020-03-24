@@ -315,9 +315,15 @@ class platformClass {
   static int initializeSD(void);
 
   //! Get the time
-  String getTime();
+  int* getTime();
   /*
   \return String with the date and time */
+  int getDay();
+  int getMonth();
+  int getYear();
+  int getHour();
+  int getMinute();
+  int getSecond();
 
  private:
   //***************************************************************

@@ -380,12 +380,13 @@ float platformClass::getBatteryVoltage(void) {
 //!* 	Returns: String * 	Example: platform.getTime();
 //!*
 //!******************************************************************************
-String platformClass::getTime() {
-  char date[20];
+int* platformClass::getTime() {
+  //char date[20];
+  static int dateTime[6];
 
-  if (!platformClass::initializedRTC) {
-    return "";
-  }
+  // if (!platformClass::initializedRTC) {
+  //   return -1;
+  // }
   DateTime now = rtc.now();  // Obtener fecha y hora actual.
 
   int day = now.day();
@@ -395,10 +396,98 @@ String platformClass::getTime() {
   int minute = now.minute();
   int second = now.second();
 
-  sprintf(date, "%.2d.%.2d.%.4d %.2d:%.2d:%.2d", day, month, year, hour, minute,
-          second);
-  return String(date);
+  // sprintf(date, "%.2d.%.2d.%.4d%.2d:%.2d:%.2d", day, month, year, hour, minute,
+  //         second);
+  //sprintf(date, "%d.%d.%d:%d:%d:%d", day, month, year, hour, minute, second);
+
+  dateTime[0] = day;
+  dateTime[1] = month;
+  dateTime[2] = year;
+  dateTime[3] = hour;
+  dateTime[4] = minute;
+  dateTime[5] = second;
+
+  //return String(date);
+  return dateTime;
 }
+
+// int platformClass::getDay() {
+//   int day;
+
+//   if(!platformClass::initializedRTC) {
+//     return -1;
+//   }
+
+//   DateTime now = rtc.now();
+//   day = now.day();
+
+//   return day;
+// }
+
+// int platformClass::getMonth() {
+//   int month;
+
+//   if(!platformClass::initializedRTC) {
+//     return -1;
+//   }
+
+//   DateTime now = rtc.now();
+//   month = now.month();
+
+//   return month;
+// }
+
+// int platformClass::getYear() {
+//   int year;
+
+//   if(!platformClass::initializedRTC) {
+//     return -1;
+//   }
+
+//   DateTime now = rtc.now();
+//   year = now.year();
+
+//   return year;
+// }
+
+int platformClass::getHour() {
+  int hour;
+  
+  if(!platformClass::initializedRTC) {
+    return -1;
+  }
+
+  DateTime now = rtc.now();
+  hour = now.hour();
+
+  return hour;
+}
+
+// int platformClass::getMinute() {
+//   int minute;
+
+//   if(!platformClass::initializedRTC) {
+//     return -1;
+//   }
+
+//   DateTime now = rtc.now();
+//   minute = now.minute();
+
+//   return minute;
+// }
+
+// int platformClass::getSecond() {
+//   int second;
+
+//   if(!platformClass::initializedRTC) {
+//     return -1;
+//   }
+
+//   DateTime now = rtc.now();
+//   second = now.second();
+
+//   return second;
+// }
 
 //!******************************************************************************
 //!	Name:	initINA0() * 	Description: Initializes sensor INA0
