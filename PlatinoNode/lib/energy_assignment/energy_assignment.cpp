@@ -38,16 +38,24 @@ assignmentClass::assignmentClass(void)
     cost_of_plan[4] = compute_cost_scheduling_plan(MATRIX_1_E, NUMBER_OF_TASKS_1_E);
     cost_of_plan[5] = compute_cost_scheduling_plan(MATRIX_1_PLAN_EMERGENCIA, NUMBER_OF_TASKS_PLAN_EMERGENCIA);
 
-    ddMMyyhhmmss[0] = 1;
-    ddMMyyhhmmss[1] = 1;
-    ddMMyyhhmmss[2] = 2012;
-    ddMMyyhhmmss[3] = 0;
-    ddMMyyhhmmss[4] = 0;
-    ddMMyyhhmmss[5] = 0;
+    // ddMMyyhhmmss[0] = 1;
+    // ddMMyyhhmmss[1] = 1;
+    // ddMMyyhhmmss[2] = 2012;
+    // ddMMyyhhmmss[3] = 0;
+    // ddMMyyhhmmss[4] = 0;
+    // ddMMyyhhmmss[5] = 0;
 }
 
-int* assignmentClass::assign_plan(void)
+int* assignmentClass::assign_plan(int *dateTime)
 {
+	//ddMMyyhhmmss = dateTime;
+	ddMMyyhhmmss[0] = dateTime[0];
+	ddMMyyhhmmss[1] = dateTime[1];
+	ddMMyyhhmmss[2] = dateTime[2];
+	ddMMyyhhmmss[3] = dateTime[3];
+	ddMMyyhhmmss[4] = dateTime[4];
+	ddMMyyhhmmss[5] = dateTime[6];
+
     int hour = 0;
     compute_efficiency(QoS, cost_of_plan, vector_efficiency, NUMBER_OF_PLANS_1);
     order_plans_by_efficiency(vector_efficiency, plans, NUMBER_OF_PLANS_1);
@@ -66,7 +74,6 @@ int* assignmentClass::assign_plan(void)
         {
             if (battery_at_slots[SLOTS] == battery_at_slots[0])
             {
-				std::cout << "Peto aqui 1" << std::endl;
                 optimal = 1;
                 break;
             }
@@ -74,11 +81,10 @@ int* assignmentClass::assign_plan(void)
             n = remove_plan_quality(plans[0], vector_efficiency, plans, n);
             if (n == 0)
             {
-				std::cout << "Peto aqui 2" << std::endl;
                 optimal = 1;
                 break;
             }
-			std::cout << "Hago upgrade" << std::endl;
+			//std::cout << "Hago upgrade" << std::endl;
             upgrade(plans[0], assignments, battery_at_slots, cost_of_plan, QoS, ddMMyyhhmmss[1] - 1);
         }
         else 
@@ -86,11 +92,10 @@ int* assignmentClass::assign_plan(void)
             n = remove_plan_cost(plans[0], cost_of_plan, vector_efficiency, plans, n);
             if (n == 0)
             {
-				std::cout << "Peto aqui 3" << std::endl;
                 admisible = 1;
                 break;
             }
-			std::cout << "Hago downgrade" << std::endl;
+			//std::cout << "Hago downgrade" << std::endl;
             downgrade(plans[0], assignments, battery_at_slots, cost_of_plan, QoS, ddMMyyhhmmss[1] - 1);
         }
     }
