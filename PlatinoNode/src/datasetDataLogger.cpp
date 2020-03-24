@@ -10,7 +10,7 @@
 #include <pb_decode.h>
 #include <pb.h>
 
-#include "energy_assignment.h"
+#include <energy_assignment.h>
 
 mtpPlatino_MSG_PHASE1_DRONE_ID msg1 = mtpPlatino_MSG_PHASE1_DRONE_ID_init_zero;
 mtpPlatino_MSG_PHASE1_ENDDEVICE_ID msg2 = mtpPlatino_MSG_PHASE1_ENDDEVICE_ID_init_zero;
@@ -28,6 +28,7 @@ unsigned long t = 0;
 uint8_t buffer[RF95_MAX_MESSAGE_LEN];
 pb_istream_t istream;
 pb_ostream_t ostream;
+bool assigned = false;
 
 /* Prototype of functions */
 void fillDataMessage(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA *msg3, uint8_t cont);
@@ -39,6 +40,7 @@ float readINA0();
 float readINA1();
 float readINA2();
 
+int *plan_assignment;
 int contLoop = 0;
 float value;
 int t_ciclo = 0;
@@ -46,8 +48,11 @@ unsigned long t1, t2, diff;
 int SEC = 5;
 String filename = "test.txt";
 String line = "";
+// String time = "";
 uint8_t mode = 0;
 //pb_PlatinoEvent platino = pb_PlatinoEvent_init_zero;
+
+assignmentClass assignment = assignmentClass();
 
 void setup()
 {
@@ -78,11 +83,31 @@ void setup()
   Serial.println("LABEL,Time,NoSample,Load(mA),Battery(mA),Panel(mA),Wind(m/s),Temperature(ºC),Humidity(%),Voltage(V),Time(ms)");
   //cols = ['Date', 'Time', 'Load', 'Battery', 'Panel','Wind', 'Temp', 'Humidity', 'Volt']
 
+  plan_assignment = assignment.assign_plan(platform.getTime());
+
   delay(1000);
 }
 
 void loop()
 {
+  int hour = platform.getHour();
+  int *aux_assignment;
+
+  if (hour == 23 && !assigned)
+  {
+    int *time = platform.getTime();
+
+    time[0] += 1;
+    time[3] = 0;
+    time[4] = 0;
+    time[5] = 0;
+
+    aux_assignment = assignment.assign_plan(time);
+    assigned = true;
+  }
+  else if (hour = 0)
+    plan_assignment = aux_assignment;
+
   // put your main code here, to run repeatedly:
   //platino.numPacket = contLoop;
   msg2.numPackets = contLoop;
