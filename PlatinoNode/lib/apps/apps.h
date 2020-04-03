@@ -6,17 +6,17 @@
 class appsClass
 {
 public:
-    void app1();
-    void app2();
-    void app3();
-    void app4();
-    void app5();
+    static void app1();
+    static void app2();
+    static void app3();
+    static void app4();
+    static void app5();
 
-private:
-    void sendToDrone();
-    int receiveSYNC();
-    int sendMyIDToDrone();
-    int sendDataToDrone(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA *msg3);
+protected:
+    static void sendToDrone(void);
+    static int receiveSYNC();
+    static int sendMyIDToDrone();
+    static int sendDataToDrone(mtpPlatino_MSG_PHASE2_ENDDEVICE_DATA *msg3);
 };
 
 extern appsClass apps;
