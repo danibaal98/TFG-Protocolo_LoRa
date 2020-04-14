@@ -109,7 +109,7 @@ int* assignmentClass::assign_plan(int *dateTime)
 	compute_efficiency(QoS, cost_of_plan, vector_efficiency, NUMBER_OF_PLANS_1);
 	order_plans_by_efficiency(vector_efficiency, plans, NUMBER_OF_PLANS_1);
 
-	if (reoptimization(assignments, x, battery_at_slots, ddMMyyhhmmss[1], cost_of_plan, QoS, plans) == -1)
+	if (reoptimization(assignments, x, battery_at_slots, ddMMyyhhmmss[1] - 1, cost_of_plan, QoS, plans) == -1)
 	{
 		// not admissible solution
 	}
