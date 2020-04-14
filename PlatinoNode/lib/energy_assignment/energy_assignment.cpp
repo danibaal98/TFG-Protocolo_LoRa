@@ -57,9 +57,14 @@ int* assignmentClass::assign_plan(int *dateTime)
 	ddMMyyhhmmss[5] = dateTime[6];
 
     int hour = 0;
+	int x, r1, r2;
     compute_efficiency(QoS, cost_of_plan, vector_efficiency, NUMBER_OF_PLANS_1);
     order_plans_by_efficiency(vector_efficiency, plans, NUMBER_OF_PLANS_1);
     get_time_from_seconds(0, ddMMyyhhmmss);
+
+	r1 = look_for_slot(SUNRISE_SLOT);
+	r2 = look_for_slot(SUNSET_SLOT);
+	x = rand() % (r2 - r1 + 1) + r1;
 
     for (int i = 0; i < SLOTS; i++)
         assignments[i] = plans[0];
@@ -99,6 +104,15 @@ int* assignmentClass::assign_plan(int *dateTime)
             downgrade(plans[0], assignments, battery_at_slots, cost_of_plan, QoS, ddMMyyhhmmss[1] - 1);
         }
     }
+	compute_qos_assignment(assignments, QoS, ddMMyyhhmmss[1]);
+
+	compute_efficiency(QoS, cost_of_plan, vector_efficiency, NUMBER_OF_PLANS_1);
+	order_plans_by_efficiency(vector_efficiency, plans, NUMBER_OF_PLANS_1);
+
+	if (reoptimization(assignments, x, battery_at_slots, ddMMyyhhmmss[1], cost_of_plan, QoS, plans) == -1)
+	{
+		// not admissible solution
+	}
     return assignments;
 }
 
