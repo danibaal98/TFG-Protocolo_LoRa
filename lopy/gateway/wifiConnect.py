@@ -2,8 +2,8 @@ from network import WLAN
 import machine
  
 def connect():
-    ssid = "MOVISTARRAYVI"
-    password = "tepaecefibra"
+    ssid = "" # el nombre de tu red Wi-Fi
+    password = "" # la contraseña de tu red Wi-Fi
 
     wlan = WLAN(mode=WLAN.STA)
 
