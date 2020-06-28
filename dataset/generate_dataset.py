@@ -7,9 +7,7 @@ cursor.execute("SELECT * FROM mtopeniot.etsensor WHERE entity_id = ? ORDER BY ti
 rows = cursor.fetchall()
 
 f = csv.writer(open("dataset.csv", 'w'))
-#f.writerow([column[0] for column in cursor.description])
 first_row = [column[0] for column in cursor.description]
-#print(type(first_row[0]))
 f.writerow(first_row)
 
 for row in rows:
