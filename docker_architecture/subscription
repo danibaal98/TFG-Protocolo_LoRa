@@ -1,0 +1,32 @@
+#!/bin/bash
+
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions/' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify QuantumLeap of count changes of any Motion Sensor",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "Sensor:*"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "temperature"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://quantumleap:8668/v2/notify"
+    },
+    "attrs": [
+      "temeperature"
+    ],
+    "metadata": ["dateCreated", "dateModified"]
+  },
+  "throttling": 1
+}'
